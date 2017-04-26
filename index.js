@@ -1,7 +1,6 @@
 'use strict';
 
-const path = require('path');
-// const loaderUtils = require('loader-utils');
+const loaderUtils = require('loader-utils');
 const SourceNode = require('source-map').SourceNode;
 const SourceMapConsumer = require('source-map').SourceMapConsumer;
 
@@ -18,14 +17,15 @@ module.exports = function injularLoader(source, map) {
     this.cacheable();
   }
 
+  const options = loaderUtils.getOptions(this);
   const resourcePath = this.resourcePath;
-  const filename = path.basename(resourcePath);
   const separator = '\n\n';
+
+  const angularString = options.requireAngular ? 'require("angular")' : 'window.angular';
 
   const prependText = [
     '/* INJULAR LOADER */',
-    'var injular = require("injular");',
-    `(${prependString})(module, require, window);`,
+    `(${prependString})(module, require, window, ${angularString});`,
     'try {',
     '(function () {',
   ].join(' ');
@@ -34,7 +34,7 @@ module.exports = function injularLoader(source, map) {
     '/* INJULAR LOADER */',
     '}).call(this);',
     '} finally {',
-    `(${appendString})(module, require, window, ${JSON.stringify(filename)});`,
+    `(${appendString})(module, require, window, ${angularString}, ${JSON.stringify(resourcePath)});`,
     '}',
   ].join(' ');
 
