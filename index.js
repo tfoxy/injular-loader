@@ -17,7 +17,7 @@ module.exports = function injularLoader(source, map) {
     this.cacheable();
   }
 
-  const options = loaderUtils.getOptions(this);
+  const options = loaderUtils.getOptions(this) || {};
   const resourcePath = this.resourcePath;
   const separator = '\n\n';
 
